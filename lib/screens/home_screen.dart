@@ -112,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
 
-      // 🔥 MAIN DEMO BODY
+      
       body: Padding(
         padding: EdgeInsets.all(16),
         child: SingleChildScrollView(
@@ -152,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               SizedBox(height: 20),
 
-              /// 🔁 Reusable Button – SAVE
+              ///  Reusable Button – SAVE
               MyButton(
                 text: "Save to SharedPreferences",
                 onPressed: () async {
@@ -170,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
               SizedBox(height: 10),
 
-              /// 🔁 Same Button class – GET
+              ///  Same Button class – GET
               MyButton(
                 text: "Get from SharedPreferences",
                 color: Colors.green,

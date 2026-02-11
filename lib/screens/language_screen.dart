@@ -148,7 +148,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
                   title: Text(filteredList[index]),
                   onTap: () async {
 
-                    // ✅ SAVE using UTIL class
+                    //  SAVE using UTIL class
                     await AppPreferences.setLanguage(
                         filteredList[index]);
 
