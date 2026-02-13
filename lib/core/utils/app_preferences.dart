@@ -73,33 +73,40 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AppPreferences {
 
-  AppPreferences._(); // private constructor
+  AppPreferences._();
 
   static const String _keyName = "name";
   static const String _keyAge = "age";
   static const String _keySalary = "salary";
   static const String _keyLanguage = "language";
+  static SharedPreferences? myPref = null;
+  static Future<void> initPref() async{
+    if (myPref == null) {
+    myPref = await SharedPreferences.getInstance();
 
+    }
+  }
   static Future<void> _set(String key, dynamic value) async {
-    final prefs = await SharedPreferences.getInstance();
-
+  await initPref();
     if (value is String) {
-      await prefs.setString(key, value);
+       myPref!.setString(key, value);
     }
     else if (value is int) {
-      await prefs.setInt(key, value);
+      myPref!.setInt(key, value);
     }
     else if (value is double) {
-      await prefs.setDouble(key, value);
+      myPref!.setDouble(key, value);
     }
     else if (value is bool) {
-      await prefs.setBool(key, value);
+      myPref!.setBool(key, value);
     }
   }
 
   static Future<dynamic> _get(String key) async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.get(key);
+    await initPref();
+    dynamic value = myPref!.get(key);
+    print(value);
+    return value;
   }
 
 

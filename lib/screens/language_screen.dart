@@ -92,6 +92,97 @@
 
 
 
+// import 'package:flutter/material.dart';
+// import '../core/utils/app_preferences.dart';
+//
+// class LanguageScreen extends StatefulWidget {
+//   @override
+//   _LanguageScreenState createState() => _LanguageScreenState();
+// }
+//
+// class _LanguageScreenState extends State<LanguageScreen> {
+//   List<String> languages = [
+//     "English",
+//     "Hindi",
+//     "Urdu",
+//     "French",
+//     "Spanish"
+//   ];
+//
+//   List<String> filteredList = [];
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//     filteredList = languages;
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(title: Text("Select Language")),
+//       body: Column(
+//         children: [
+//           Padding(
+//             padding: EdgeInsets.all(8),
+//             child: TextField(
+//               decoration: InputDecoration(
+//                 hintText: "Search language",
+//                 border: OutlineInputBorder(),
+//               ),
+//               onChanged: (value) {
+//                 setState(() {
+//                   filteredList = languages
+//                       .where((e) =>
+//                           e.toLowerCase().contains(value.toLowerCase()))
+//                       .toList();
+//                 });
+//               },
+//             ),
+//           ),
+//           Expanded(
+//             child: ListView.builder(
+//               itemCount: filteredList.length,
+//               itemBuilder: (_, index) {
+//                 return ListTile(
+//                   title: Text(filteredList[index]),
+//                   onTap: () async {
+//
+//                     //  SAVE using UTIL class
+//                     await AppPreferences.setLanguage(
+//                         filteredList[index]);
+//
+//                     showDialog(
+//                       context: context,
+//                       builder: (_) => AlertDialog(
+//                         title: Text("Language"),
+//                         content: Text(
+//                           "You have selected ${filteredList[index]}",
+//                         ),
+//                         actions: [
+//                           TextButton(
+//                             onPressed: () {
+//                               Navigator.pop(context); // dialog
+//                               Navigator.pop(
+//                                   context, filteredList[index]); // screen
+//                             },
+//                             child: Text("OK"),
+//                           )
+//                         ],
+//                       ),
+//                     );
+//                   },
+//                 );
+//               },
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+
 import 'package:flutter/material.dart';
 import '../core/utils/app_preferences.dart';
 
@@ -114,7 +205,14 @@ class _LanguageScreenState extends State<LanguageScreen> {
   @override
   void initState() {
     super.initState();
-    filteredList = languages;
+    filteredList = List.from(languages); // important
+  }
+
+  void _deleteLanguage(String language) {
+    setState(() {
+      languages.remove(language);
+      filteredList.remove(language);
+    });
   }
 
   @override
@@ -134,7 +232,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
                 setState(() {
                   filteredList = languages
                       .where((e) =>
-                          e.toLowerCase().contains(value.toLowerCase()))
+                      e.toLowerCase().contains(value.toLowerCase()))
                       .toList();
                 });
               },
@@ -144,27 +242,34 @@ class _LanguageScreenState extends State<LanguageScreen> {
             child: ListView.builder(
               itemCount: filteredList.length,
               itemBuilder: (_, index) {
-                return ListTile(
-                  title: Text(filteredList[index]),
-                  onTap: () async {
+                final language = filteredList[index];
 
-                    //  SAVE using UTIL class
-                    await AppPreferences.setLanguage(
-                        filteredList[index]);
+                return ListTile(
+                  title: Text(language),
+
+
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete, color: Colors.red),
+                    onPressed: () {
+                      _deleteLanguage(language);
+                    },
+                  ),
+
+                  onTap: () async {
+                    await AppPreferences.setLanguage(language);
 
                     showDialog(
                       context: context,
                       builder: (_) => AlertDialog(
                         title: Text("Language"),
                         content: Text(
-                          "You have selected ${filteredList[index]}",
+                          "You have selected $language",
                         ),
                         actions: [
                           TextButton(
                             onPressed: () {
-                              Navigator.pop(context); // dialog
-                              Navigator.pop(
-                                  context, filteredList[index]); // screen
+                              Navigator.pop(context);
+                              Navigator.pop(context, language);
                             },
                             child: Text("OK"),
                           )
