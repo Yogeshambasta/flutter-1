@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 class AdMobUtil {
 
+  /// Initialize AdMob SDK
   static Future<void> initialize() async {
     await MobileAds.instance.initialize();
   }
@@ -12,6 +13,10 @@ class AdMobUtil {
     return "ca-app-pub-3940256099942544/6300978111";
   }
 
+  ///  Single AdRequest instance
+  static const AdRequest _adRequest = AdRequest();
+
+  /// Create Banner Ad
   static BannerAd createBannerAd({
     required VoidCallback onAdLoaded,
     required Function(LoadAdError) onAdFailed,
@@ -19,7 +24,7 @@ class AdMobUtil {
     return BannerAd(
       adUnitId: bannerAdUnitId,
       size: AdSize.banner,
-      request: const AdRequest(),
+      request: _adRequest,
       listener: BannerAdListener(
         onAdLoaded: (_) => onAdLoaded(),
         onAdFailedToLoad: (_, error) => onAdFailed(error),
