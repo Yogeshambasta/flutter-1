@@ -369,11 +369,159 @@
 // }
 
 
+// import 'package:flutter/material.dart';
+// import '../../category/category_detail_screen.dart';
+//
+// class CategoriesScreen extends StatelessWidget {
+//   const CategoriesScreen({super.key});
+//
+//   static const List<Map<String, String>> categories = [
+//     {
+//       "title": "History",
+//       "image":
+//       "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f"
+//     },
+//     {
+//       "title": "Finance",
+//       "image":
+//       "https://images.unsplash.com/photo-1559526324-593bc073d938"
+//     },
+//     {
+//       "title": "Sports",
+//       "image":
+//       "https://images.unsplash.com/photo-1505842465776-3d90f616310d"
+//     },
+//     {
+//       "title": "Travel",
+//       "image":
+//       "https://images.unsplash.com/photo-1507525428034-b723cf961d3e"
+//     },
+//     {
+//       "title": "Entertainment",
+//       "image":
+//       "https://images.unsplash.com/photo-1497032205916-ac775f0649ae"
+//     },
+//     {
+//       "title": "Science",
+//       "image":
+//       "https://images.unsplash.com/photo-1581093588401-22d1a7f1d2e6"
+//     },
+//   ];
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Column(
+//       children: [
+//         Container(
+//           width: double.infinity,
+//           padding:
+//           const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+//           color: Colors.white,
+//           child: const Text(
+//             "Categories",
+//             style: TextStyle(
+//               fontSize: 26,
+//               fontWeight: FontWeight.bold,
+//             ),
+//           ),
+//         ),
+//
+//         Expanded(
+//           child: Padding(
+//             padding: const EdgeInsets.all(16),
+//             child: GridView.builder(
+//               itemCount: categories.length,
+//               gridDelegate:
+//               const SliverGridDelegateWithFixedCrossAxisCount(
+//                 crossAxisCount: 2,
+//                 mainAxisSpacing: 16,
+//                 crossAxisSpacing: 16,
+//                 childAspectRatio: 0.9,
+//               ),
+//               itemBuilder: (context, index) {
+//                 final item = categories[index];
+//
+//                 return GestureDetector(
+//                   onTap: () async {
+//                     final result = await Navigator.push(
+//                       context,
+//                       MaterialPageRoute(
+//                         builder: (_) => CategoryDetailScreen(
+//                           title: item["title"]!,
+//                           description:
+//                           "Welcome to ${item["title"]} page",
+//                         ),
+//                       ),
+//                     );
+//
+//                     if (result != null) {
+//                       debugPrint("Returned Data: $result");
+//                     }
+//                   },
+//                   child: ClipRRect(
+//                     borderRadius: BorderRadius.circular(20),
+//                     child: Stack(
+//                       children: [
+//                         Positioned.fill(
+//                           child: Image.network(
+//                             item["image"]!,
+//                             fit: BoxFit.cover,
+//                           ),
+//                         ),
+//                         Positioned.fill(
+//                           child: Container(
+//                             decoration: BoxDecoration(
+//                               gradient: LinearGradient(
+//                                 begin: Alignment.topCenter,
+//                                 end: Alignment.bottomCenter,
+//                                 colors: [
+//                                   Colors.transparent,
+//                                   Colors.black.withOpacity(0.6),
+//                                 ],
+//                               ),
+//                             ),
+//                           ),
+//                         ),
+//                         Positioned(
+//                           bottom: 16,
+//                           left: 16,
+//                           child: Text(
+//                             item["title"]!,
+//                             style: const TextStyle(
+//                               color: Colors.white,
+//                               fontSize: 20,
+//                               fontWeight: FontWeight.bold,
+//                             ),
+//                           ),
+//                         ),
+//                       ],
+//                     ),
+//                   ),
+//                 );
+//               },
+//             ),
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+// }
+
+
+
 import 'package:flutter/material.dart';
 import '../../category/category_detail_screen.dart';
 
-class CategoriesScreen extends StatelessWidget {
+class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({super.key});
+
+  @override
+  State<CategoriesScreen> createState() => _CategoriesScreenState();
+}
+
+class _CategoriesScreenState extends State<CategoriesScreen> {
+
+  String? _lastReturnedData;
 
   static const List<Map<String, String>> categories = [
     {
@@ -389,7 +537,7 @@ class CategoriesScreen extends StatelessWidget {
     {
       "title": "Sports",
       "image":
-      "https://images.unsplash.com/photo-1505842465776-3d90f616310d"
+      "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=800"
     },
     {
       "title": "Travel",
@@ -404,7 +552,7 @@ class CategoriesScreen extends StatelessWidget {
     {
       "title": "Science",
       "image":
-      "https://images.unsplash.com/photo-1581093588401-22d1a7f1d2e6"
+      "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800"
     },
   ];
 
@@ -412,6 +560,8 @@ class CategoriesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
+
+        /// Header
         Container(
           width: double.infinity,
           padding:
@@ -426,6 +576,19 @@ class CategoriesScreen extends StatelessWidget {
           ),
         ),
 
+        /// Show Returned Data (For Testing)
+        if (_lastReturnedData != null)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            color: Colors.blue.shade50,
+            child: Text(
+              "Last Action: $_lastReturnedData",
+              style: const TextStyle(fontWeight: FontWeight.w500),
+            ),
+          ),
+
+        /// Grid
         Expanded(
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -443,6 +606,8 @@ class CategoriesScreen extends StatelessWidget {
 
                 return GestureDetector(
                   onTap: () async {
+
+                    /// Navigate and Wait for Result
                     final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -454,8 +619,17 @@ class CategoriesScreen extends StatelessWidget {
                       ),
                     );
 
+                    /// Receive Returned Data
                     if (result != null) {
-                      debugPrint("Returned Data: $result");
+                      setState(() {
+                        _lastReturnedData = result.toString();
+                      });
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Returned: $result"),
+                        ),
+                      );
                     }
                   },
                   child: ClipRRect(

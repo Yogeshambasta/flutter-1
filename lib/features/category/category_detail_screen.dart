@@ -107,8 +107,12 @@ class _CategoryDetailScreenState
   }
 
   void _goBackWithData() {
-    Navigator.pop(context, "User visited ${widget.title}");
+    String dataToReturn =
+        "User spent time on ${widget.title}";
+
+    Navigator.pop(context, dataToReturn);
   }
+
 
   @override
   Widget build(BuildContext context) {
