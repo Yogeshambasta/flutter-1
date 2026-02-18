@@ -77,8 +77,14 @@ import 'package:file_picker/file_picker.dart';
 
 class PickedFileData {
   final String name;
+  final String path;
+  final int size;
 
-  PickedFileData({required this.name});
+  PickedFileData({
+    required this.name,
+    required this.path,
+    required this.size,
+  });
 }
 
 class FileService {
@@ -96,9 +102,10 @@ class FileService {
 
       return PickedFileData(
         name: file.name,
+        path: file.path ?? "",
+        size: file.size,
       );
     } catch (e) {
-      print("FileService Error: $e");
       return null;
     }
   }
