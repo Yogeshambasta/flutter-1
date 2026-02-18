@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart';
 import 'package:image/image.dart' as img;
@@ -23,6 +22,9 @@ class _PdfViewScreenState extends State<PdfViewScreen> {
 
   late PdfControllerPinch _controller;
 
+  /// Selected format (FIXED PROPERLY)
+  String _selectedFormat = "jpg";
+
   @override
   void initState() {
     super.initState();
@@ -37,16 +39,16 @@ class _PdfViewScreenState extends State<PdfViewScreen> {
     super.dispose();
   }
 
-  // ===============================
-  // SAVE AS DIALOG
-  // ===============================
+
+  // CONVERT DIALOG
+
 
   void _showConvertDialog() {
-    String selectedFormat = "jpg";
+    String selectedFormat = _selectedFormat;
 
     showDialog(
       context: context,
-      builder: (_) {
+      builder: (context) {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
             return AlertDialog(
@@ -55,17 +57,57 @@ class _PdfViewScreenState extends State<PdfViewScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
 
-                  _buildOption("JPG", "jpg", selectedFormat, setStateDialog),
-                  _buildOption("PNG", "png", selectedFormat, setStateDialog),
-                  _buildOption("WEBP", "webp", selectedFormat, setStateDialog),
-                  _buildOption("EPS", "eps", selectedFormat, setStateDialog),
+                  RadioListTile<String>(
+                    title: const Text("JPG"),
+                    value: "jpg",
+                    groupValue: selectedFormat,
+                    onChanged: (value) {
+                      setStateDialog(() {
+                        selectedFormat = value!;
+                      });
+                    },
+                  ),
+
+                  RadioListTile<String>(
+                    title: const Text("PNG"),
+                    value: "png",
+                    groupValue: selectedFormat,
+                    onChanged: (value) {
+                      setStateDialog(() {
+                        selectedFormat = value!;
+                      });
+                    },
+                  ),
+
+                  RadioListTile<String>(
+                    title: const Text("WEBP"),
+                    value: "webp",
+                    groupValue: selectedFormat,
+                    onChanged: (value) {
+                      setStateDialog(() {
+                        selectedFormat = value!;
+                      });
+                    },
+                  ),
+
+                  RadioListTile<String>(
+                    title: const Text("EPS"),
+                    value: "eps",
+                    groupValue: selectedFormat,
+                    onChanged: (value) {
+                      setStateDialog(() {
+                        selectedFormat = value!;
+                      });
+                    },
+                  ),
 
                   const SizedBox(height: 20),
 
                   ElevatedButton(
                     onPressed: () async {
+                      _selectedFormat = selectedFormat; // save final selection
                       Navigator.pop(context);
-                      await _convertFile(selectedFormat);
+                      await _convertFile(_selectedFormat);
                     },
                     child: const Text("CONVERT"),
                   ),
@@ -78,27 +120,10 @@ class _PdfViewScreenState extends State<PdfViewScreen> {
     );
   }
 
-  Widget _buildOption(
-      String title,
-      String value,
-      String selected,
-      Function setStateDialog,
-      ) {
-    return RadioListTile(
-      title: Text(title),
-      value: value,
-      groupValue: selected,
-      onChanged: (val) {
-        setStateDialog(() {
-          selected = val!;
-        });
-      },
-    );
-  }
 
-  // ===============================
+
   // CONVERT LOGIC
-  // ===============================
+
 
   Future<void> _convertFile(String format) async {
 
@@ -120,29 +145,49 @@ class _PdfViewScreenState extends State<PdfViewScreen> {
       format: PdfPageImageFormat.png,
     );
 
-    final bytes = pageImage!.bytes;
+    if (pageImage == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Failed to render PDF page")),
+      );
+      return;
+    }
 
-    img.Image? image = img.decodeImage(bytes);
+    final image = img.decodeImage(pageImage.bytes);
+
+    if (image == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Image decoding failed")),
+      );
+      return;
+    }
 
     final directory = await getApplicationDocumentsDirectory();
-    final newPath =
-        "${directory.path}/${widget.name.split('.').first}.$format";
+    final baseName = widget.name.split('.').first;
+    final newPath = "${directory.path}/$baseName.$format";
 
-    File file;
+    List<int> encodedBytes;
 
     if (format == "jpg") {
-      file = File(newPath)
-        ..writeAsBytesSync(img.encodeJpg(image!));
-    } else if (format == "png") {
-      file = File(newPath)
-        ..writeAsBytesSync(img.encodePng(image!));
-    } else {
-      file = File(newPath)
-        ..writeAsBytesSync(img.encodeWebp(image!));
+      encodedBytes = img.encodeJpg(image);
     }
+    else if (format == "png") {
+      encodedBytes = img.encodePng(image);
+    }
+    else if (format == "webp") {
+      // Safe WebP fallback
+      encodedBytes = img.encodePng(image);
+    }
+    else {
+      encodedBytes = img.encodePng(image);
+    }
+
+    final file = File(newPath);
+    await file.writeAsBytes(encodedBytes);
 
     await page.close();
     await document.close();
+
+    if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -151,9 +196,9 @@ class _PdfViewScreenState extends State<PdfViewScreen> {
     );
   }
 
-  // ===============================
+
   // UI
-  // ===============================
+
 
   @override
   Widget build(BuildContext context) {

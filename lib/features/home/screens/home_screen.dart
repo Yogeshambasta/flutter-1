@@ -784,6 +784,8 @@ import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart';
 import '../../../core/services/file_service.dart';
 import 'categories_screen.dart';
+import 'pdf_view_screen.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -964,69 +966,79 @@ class _HomeScreenState extends State<HomeScreen> {
               itemBuilder: (context, index) {
                 final file = _selectedFiles[index];
 
-                return Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius:
-                    BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black
-                            .withOpacity(0.05),
-                        blurRadius: 8,
+                return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PdfViewScreen(
+                            path: file.path,
+                            name: file.name,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 8,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
+                      child: Column(
+                        children: [
+                          /// THUMBNAIL + ICONS
+                          Expanded(
+                            child: Stack(
+                              children: [
+                                /// PDF Thumbnail
+                                Positioned.fill(
+                                  child: ClipRRect(
+                                    borderRadius:
+                                    const BorderRadius.vertical(
+                                      top: Radius.circular(16),
+                                    ),
+                                    child:
+                                    FutureBuilder<Uint8List?>(
+                                      future:
+                                      _renderPdfPreview(
+                                          file.path),
+                                      builder:
+                                          (context, snapshot) {
+                                        if (snapshot
+                                            .connectionState ==
+                                            ConnectionState
+                                                .waiting) {
+                                          return const Center(
+                                            child:
+                                            CircularProgressIndicator(),
+                                          );
+                                        }
 
-                      /// Thumbnail + Icons
-                      Expanded(
-                        child: Stack(
-                          children: [
+                                        if (!snapshot
+                                            .hasData) {
+                                          return const Center(
+                                            child: Icon(
+                                              Icons.picture_as_pdf,
+                                              size: 50,
+                                              color:
+                                              Colors.red,
+                                            ),
+                                          );
+                                        }
 
-                            Positioned.fill(
-                              child: ClipRRect(
-                                borderRadius:
-                                const BorderRadius.vertical(
-                                  top: Radius.circular(16),
+                                        return Image.memory(
+                                          snapshot.data!,
+                                          fit: BoxFit.cover,
+                                        );
+                                      },
+                                    ),
+                                  ),
                                 ),
-                                child:
-                                FutureBuilder<Uint8List?>(
-                                  future:
-                                  _renderPdfPreview(
-                                      file.path),
-                                  builder:
-                                      (context, snapshot) {
-                                    if (snapshot
-                                        .connectionState ==
-                                        ConnectionState
-                                            .waiting) {
-                                      return const Center(
-                                          child:
-                                          CircularProgressIndicator());
-                                    }
-
-                                    if (!snapshot
-                                        .hasData) {
-                                      return const Center(
-                                        child: Icon(
-                                            Icons
-                                                .picture_as_pdf,
-                                            size: 50,
-                                            color:
-                                            Colors.red),
-                                      );
-                                    }
-
-                                    return Image.memory(
-                                      snapshot.data!,
-                                      fit: BoxFit.cover,
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
 
                             /// Delete
                             Positioned(
@@ -1133,6 +1145,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
+                    ),
                 );
               },
             ),
